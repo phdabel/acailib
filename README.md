@@ -67,3 +67,8 @@ Como o projeto é novo apenas a rede neural MLP e o algoritmo backpropagation fo
 O próximo passo é o desenvolvimento da rede neural Long Short-Term Memory que será utilizada para implementação do [método sec2sec, "Sequence to sequence learning with neural networks"](https://projetos.cpd.ufrgs.br/documents/690) no desenvolvimento de um robô de conversação para o Centro de Processamento de Dados.
 
 Outros modelos podem ser desenvolvidos como colaboração para estudantes e pesquisadores das áreas afins.
+
+Modelagem
+----------
+
+![alt tag](http://gitlab.dev.ufrgs.br/abel/acai-lib/blob/master/project-uml/ACAI-LIB.png)
