@@ -8,6 +8,7 @@
 #include "Edge.h"
 #include "ObjectID.h"
 #include "UnitType.h"
+#include "../neuralnet/neuron/Neuron.h"
 #include "IUnit.h"
 #include <typeinfo>
 #include <iostream>
@@ -49,6 +50,16 @@ IUnit& Edge::getVertex1(){
 
 IUnit& Edge::getVertex2(){
     return *this->v2;
+}
+
+std::string Edge::getI(){
+    Neuron* tmpI = (Neuron*)&this->getVertex1();
+    return tmpI->getIndex();
+}
+
+std::string Edge::getJ(){
+    Neuron* tmpJ = (Neuron*)&this->getVertex2();
+    return tmpJ->getIndex();
 }
 
 void Edge::setWeight(double w){

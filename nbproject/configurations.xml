@@ -25,9 +25,19 @@
         <logicalFolder name="f1" displayName="functions" projectFiles="true">
           <itemPath>neuralnet/functions/FuncRectifier.cpp</itemPath>
           <itemPath>neuralnet/functions/FuncRectifier.h</itemPath>
+          <itemPath>neuralnet/functions/FuncSigmoid.cpp</itemPath>
+          <itemPath>neuralnet/functions/FuncSigmoid.h</itemPath>
           <itemPath>neuralnet/functions/FuncTanH.cpp</itemPath>
           <itemPath>neuralnet/functions/FuncTanH.h</itemPath>
           <itemPath>neuralnet/functions/IActivationFunction.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f3" displayName="neuron" projectFiles="true">
+          <itemPath>neuralnet/neuron/AbstractNeuron.cpp</itemPath>
+          <itemPath>neuralnet/neuron/AbstractNeuron.h</itemPath>
+          <itemPath>neuralnet/neuron/BiasNeuron.cpp</itemPath>
+          <itemPath>neuralnet/neuron/BiasNeuron.h</itemPath>
+          <itemPath>neuralnet/neuron/Neuron.cpp</itemPath>
+          <itemPath>neuralnet/neuron/Neuron.h</itemPath>
         </logicalFolder>
         <itemPath>neuralnet/IAbstractLayer.h</itemPath>
         <itemPath>neuralnet/INeuralNetwork.h</itemPath>
@@ -36,8 +46,11 @@
         <itemPath>neuralnet/LayerType.h</itemPath>
         <itemPath>neuralnet/MultiLayerPerceptron.cpp</itemPath>
         <itemPath>neuralnet/MultiLayerPerceptron.h</itemPath>
-        <itemPath>neuralnet/Neuron.cpp</itemPath>
-        <itemPath>neuralnet/Neuron.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="problem" projectFiles="true">
+        <itemPath>problem/IMatrix.h</itemPath>
+        <itemPath>problem/WeightMatrix.cpp</itemPath>
+        <itemPath>problem/WeightMatrix.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="utils" projectFiles="true">
         <itemPath>utils/IdGenerator.cpp</itemPath>
@@ -48,11 +61,30 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Arquivos de Recurso"
                    projectFiles="true">
+      <logicalFolder name="f1" displayName="data" projectFiles="true">
+        <itemPath>data/xor.dat</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Arquivos de Teste"
                    projectFiles="false"
                    kind="TEST_LOGICAL_FOLDER">
+      <logicalFolder name="f3"
+                     displayName="BackPropagationLearning_Test"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/neuralnet/BackPropagationTest.cpp</itemPath>
+        <itemPath>tests/neuralnet/BackPropagationTest.h</itemPath>
+        <itemPath>tests/neuralnet/learning_test.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4"
+                     displayName="BiasNeuron_Test"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/neuralnet/BiasNeuronTest.cpp</itemPath>
+        <itemPath>tests/neuralnet/BiasNeuronTest.h</itemPath>
+        <itemPath>tests/neuralnet/neuronrunner.cpp</itemPath>
+      </logicalFolder>
       <logicalFolder name="f2"
                      displayName="Layer_Test"
                      projectFiles="true"
@@ -110,6 +142,8 @@
       </item>
       <item path="core/UnitType.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="data/xor.dat" ex="false" tool="3" flavor2="0">
+      </item>
       <folder path="TestFiles">
         <linkerTool>
           <linkerLibItems>
@@ -145,6 +179,34 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f3">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f3</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <folder path="TestFiles/f5">
         <cTool>
           <commandLine>`cppunit-config --cflags`</commandLine>
@@ -175,10 +237,6 @@
       </item>
       <item path="neuralnet/MultiLayerPerceptron.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="neuralnet/Neuron.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="neuralnet/Neuron.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="neuralnet/algorithms/BackPropagationLearning.cpp"
             ex="false"
             tool="1"
@@ -204,6 +262,13 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="neuralnet/functions/FuncSigmoid.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="neuralnet/functions/FuncSigmoid.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="neuralnet/functions/FuncTanH.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="neuralnet/functions/FuncTanH.h" ex="false" tool="3" flavor2="0">
@@ -212,6 +277,41 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/AbstractNeuron.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/AbstractNeuron.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/BiasNeuron.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/BiasNeuron.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/Neuron.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/Neuron.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="problem/IMatrix.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="problem/WeightMatrix.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="problem/WeightMatrix.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BackPropagationTest.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BackPropagationTest.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BiasNeuronTest.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BiasNeuronTest.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/neuralnet/Layer_Test.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -239,6 +339,8 @@
       </item>
       <item path="tests/neuralnet/layer_runner.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="tests/neuralnet/learning_test.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="tests/neuralnet/multilayerperceptron-runner.cpp"
             ex="false"
             tool="1"
@@ -248,6 +350,8 @@
             ex="false"
             tool="1"
             flavor2="0">
+      </item>
+      <item path="tests/neuralnet/neuronrunner.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="utils/IdGenerator.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -287,6 +391,8 @@
       </item>
       <item path="core/UnitType.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="data/xor.dat" ex="false" tool="3" flavor2="0">
+      </item>
       <folder path="TestFiles/f1">
         <cTool>
           <commandLine>`cppunit-config --cflags`</commandLine>
@@ -310,6 +416,34 @@
         </ccTool>
         <linkerTool>
           <output>${TESTDIR}/TestFiles/f2</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f3">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f3</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
           <linkerLibItems>
             <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
           </linkerLibItems>
@@ -345,10 +479,6 @@
       </item>
       <item path="neuralnet/MultiLayerPerceptron.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="neuralnet/Neuron.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="neuralnet/Neuron.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="neuralnet/algorithms/BackPropagationLearning.cpp"
             ex="false"
             tool="1"
@@ -374,6 +504,13 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="neuralnet/functions/FuncSigmoid.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="neuralnet/functions/FuncSigmoid.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="neuralnet/functions/FuncTanH.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="neuralnet/functions/FuncTanH.h" ex="false" tool="3" flavor2="0">
@@ -382,6 +519,41 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/AbstractNeuron.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/AbstractNeuron.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/BiasNeuron.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/BiasNeuron.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/Neuron.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="neuralnet/neuron/Neuron.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="problem/IMatrix.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="problem/WeightMatrix.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="problem/WeightMatrix.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BackPropagationTest.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BackPropagationTest.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BiasNeuronTest.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/neuralnet/BiasNeuronTest.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/neuralnet/Layer_Test.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -409,6 +581,8 @@
       </item>
       <item path="tests/neuralnet/layer_runner.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="tests/neuralnet/learning_test.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="tests/neuralnet/multilayerperceptron-runner.cpp"
             ex="false"
             tool="1"
@@ -418,6 +592,8 @@
             ex="false"
             tool="1"
             flavor2="0">
+      </item>
+      <item path="tests/neuralnet/neuronrunner.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="utils/IdGenerator.cpp" ex="false" tool="1" flavor2="0">
       </item>

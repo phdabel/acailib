@@ -9,17 +9,19 @@
 #define NETWORKPOTENTIAL_TEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "../../neuralnet/Neuron.h"
+#include "../../neuralnet/neuron/Neuron.h"
 #include "../../core/Edge.h"
 #include "../../core/ObjectID.h"
 #include "../../neuralnet/functions/FuncRectifier.h"
 #include "../../neuralnet/functions/FuncTanH.h"
+#include "../../neuralnet/functions/FuncSigmoid.h"
 
 class NetworkPotential_Test : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(NetworkPotential_Test);
 
     CPPUNIT_TEST(testInputNeuronValues);
     CPPUNIT_TEST(testTanHFunc);
+    CPPUNIT_TEST(testSigmoidFunc);
     CPPUNIT_TEST(testRectifier);
     CPPUNIT_TEST_SUITE_END();
 
@@ -41,7 +43,7 @@ public:
     //activation functions
     FuncTanH fTH;
     FuncRectifier fR;
-    
+    FuncSigmoid fS;
     
     //edges of the first input neuron
     Edge ed11 {this->x1,this->i1};
@@ -55,6 +57,7 @@ public:
 private:
     void testInputNeuronValues();
     void testTanHFunc();
+    void testSigmoidFunc();
     void testRectifier();
 };
 

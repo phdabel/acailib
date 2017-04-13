@@ -6,8 +6,8 @@
  */
 
 #include "BackPropagationLearning.h"
-#include "../MultiLayerPerceptron.h"
 #include "../Layer.h"
+#include "../neuron/Neuron.h"
 
 
 
@@ -36,11 +36,11 @@ double BackPropagationLearning::getLearningRate() {
     return this->learningRate;
 }
 
-void BackPropagationLearning::setNetwork(MultiLayerPerceptron * net) {
-    this->network = net;
+void BackPropagationLearning::setNetwork(MultiLayerPerceptron* network){
+    this->network = network;
 }
 
-MultiLayerPerceptron* BackPropagationLearning::getNetwork() {
+MultiLayerPerceptron* BackPropagationLearning::getNetwork(){
     return this->network;
 }
 
@@ -53,7 +53,7 @@ void BackPropagationLearning::learn(){
 }
 
 void BackPropagationLearning::propagate() {
-
+    
 }
 
 void BackPropagationLearning::backpropagate() {
@@ -64,7 +64,7 @@ double BackPropagationLearning::computeMeanSquaredError() {
 
 }
 
-double BackPropagationLearning::computeSquaredError() {
+double BackPropagationLearning::computeSquaredError(Neuron &n) {
 
 }
 

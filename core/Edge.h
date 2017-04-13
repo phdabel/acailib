@@ -18,6 +18,8 @@
 #include "UnitType.h"
 #include "ObjectID.h"
 
+using namespace std;
+
 class Edge : public IUnit {
 public:
     Edge(IUnit &v1, IUnit &v2);
@@ -27,6 +29,8 @@ public:
     std::string toString() override;
     IUnit& getVertex1();
     IUnit& getVertex2();
+    std::string getI();
+    std::string getJ();
     double getWeight();
     void setWeight(double w);
     Edge(const Edge& orig);

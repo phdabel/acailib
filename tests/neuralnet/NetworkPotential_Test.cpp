@@ -5,7 +5,7 @@
  * Created on 21/11/2016, 16:09:46
  */
 #include "NetworkPotential_Test.h"
-#include "../../neuralnet/Neuron.h"
+#include "../../neuralnet/neuron/Neuron.h"
 #include "../../core/Edge.h"
 #include "../../core/ObjectID.h"
 #include "../../neuralnet/functions/FuncTanH.h"
@@ -114,6 +114,44 @@ void NetworkPotential_Test::testTanHFunc(){
     
     double vi3 = ((0.5*1.0)+(0.2*-1.0));
     vi3 = (2/(1+exp(-2*vi3)))-1;
+    
+    CPPUNIT_ASSERT(this->i1.eval() == vi1);
+    CPPUNIT_ASSERT(this->i2.eval() == vi2);
+    CPPUNIT_ASSERT(this->i3.eval() == vi3);
+    
+}
+
+
+/**
+ * Testa o valor de saida dos neuronios da camada oculta, utilizando a funcao de ativacao
+ * Sigmoide.
+ * 
+ * Considere a seguinte notacao:
+ * v_{j}^{o}(n) -> potencial de ativação do neurônio {j} da camada oculta {o} no tempo discreto (t);
+ * w_{ji}^{o} -> peso da aresta que conecta o neurônio de entrada {i} ao neuronio {j}
+ * x_{i}(t) -> valor do neurônio {i} no tempo (t)
+ * 
+ * v_{j}^{o}(t) = \sum_{i=0}^{N} w_{ji}^{o}*x_{i}(t)
+ * 
+ * A saida do neuronio sera f(v_{j}^{o}(t)), onde f(.) sera a funcao de ativacao.
+ * 
+ * Sigmoid Function
+ * f(x) = (1/(1+exp^{-x}))
+ * 
+ */
+void NetworkPotential_Test::testSigmoidFunc(){
+    this->i1.setFunction(this->fS);
+    this->i2.setFunction(this->fS);
+    this->i3.setFunction(this->fS);
+    
+    double vi1 = ((0.5*1.0)+(0.3*-1.0));
+    vi1 = (1/(1+exp(-vi1)));
+    
+    double vi2 = ((0.5*1.0)+(0.5*-1.0));
+    vi2 = (1/(1+exp(-vi2)));
+    
+    double vi3 = ((0.5*1.0)+(0.2*-1.0));
+    vi3 = (1/(1+exp(-vi3)));
     
     CPPUNIT_ASSERT(this->i1.eval() == vi1);
     CPPUNIT_ASSERT(this->i2.eval() == vi2);

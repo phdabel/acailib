@@ -10,24 +10,24 @@
 #define BACKPROPAGATIONLEARNING_H
 
 #include "ILearningAlgorithm.h"
-
-#include "../MultiLayerPerceptron.h"
 #include "../Layer.h"
+#include "../neuron/Neuron.h"
+#include "../MultiLayerPerceptron.h"
 
 class BackPropagationLearning: public ILearningAlgorithm<MultiLayerPerceptron> {
 public:
     BackPropagationLearning();
     BackPropagationLearning(const BackPropagationLearning& orig);
     virtual ~BackPropagationLearning();
-    double computeSquaredError();
+    double computeSquaredError(Neuron &n);
     double computeMeanSquaredError();
     void setIterations(int itr) override;
     int getIterations() override;
     void setLearningRate(double lrt) override;
     double getLearningRate() override;
     void run() override;
+    void setNetwork(MultiLayerPerceptron* network) override;
     MultiLayerPerceptron* getNetwork() override;
-    void setNetwork(MultiLayerPerceptron* net) override;
 protected:
     void learn() override;
 private:

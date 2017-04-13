@@ -12,7 +12,8 @@ enum UnitType{
     FACTOR,
     POTENTIAL,
     NEURON,
-    EDGE
+    EDGE,
+    BIAS
 };
 
 

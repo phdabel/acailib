@@ -9,7 +9,8 @@
 #define LAYER_TEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "../../neuralnet/Neuron.h"
+#include "../../neuralnet/neuron/Neuron.h"
+#include "../../neuralnet/neuron/BiasNeuron.h"
 #include "../../core/Edge.h"
 #include "../../core/ObjectID.h"
 #include "../../neuralnet/functions/FuncTanH.h"
@@ -24,6 +25,8 @@ class Layer_Test : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(testInsertNeurons);
     CPPUNIT_TEST(testNeuronValueUpdate);
     CPPUNIT_TEST(testEvaluateLayers);
+    CPPUNIT_TEST(testGetNeuron);
+    CPPUNIT_TEST(testGetEdge);
 
     CPPUNIT_TEST_SUITE_END();
 
@@ -39,12 +42,12 @@ public:
     ObjectID ei0y1, ei1y1, ei2y1;
     
     //bias neuron
-    Neuron x0;
+    BiasNeuron x0;
     //input neurons
     Neuron x1;
     Neuron x2;
     //hidden layer neurons
-    Neuron i0;
+    BiasNeuron i0;
     Neuron i1;
     Neuron i2;
     //output layer neuron
@@ -68,10 +71,13 @@ public:
     Edge edi1y1 {this->i1, this->y1};
     Edge edi2y1 {this->i2, this->y1};
     
+    Layer *inputL, *hiddenL, *outputL;
 private:
     void testInsertNeurons();
     void testNeuronValueUpdate();
     void testEvaluateLayers();
+    void testGetNeuron();
+    void testGetEdge();
 };
 
 #endif /* LAYER_TEST_H */

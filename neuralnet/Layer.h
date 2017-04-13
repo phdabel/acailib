@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <map>
-#include "Neuron.h"
+#include "neuron/AbstractNeuron.h"
 #include "LayerType.h"
 #include "../core/ObjectID.h"
 #include "IAbstractLayer.h"
@@ -29,12 +29,13 @@ public:
     Layer(LayerType type);
     Layer(const Layer& orig);
     virtual ~Layer();
-    vector<Neuron*> getNeurons() override;
-    void addNeuron(Neuron *neuron) override;
+    vector<AbstractNeuron*> getNeurons() override;
+    void addNeuron(AbstractNeuron *neuron) override;
     LayerType getType();
     void setType(LayerType type);
+    AbstractNeuron& getNeuron(int i) override;
 private:
-    map<ObjectID*,Neuron*,compareObjectID> neurons;
+    map<ObjectID*,AbstractNeuron*,compareObjectID> neurons;
     LayerType type;
 };
 

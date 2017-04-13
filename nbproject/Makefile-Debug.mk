@@ -40,10 +40,14 @@ OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/neuralnet/Layer.o \
 	${OBJECTDIR}/neuralnet/MultiLayerPerceptron.o \
-	${OBJECTDIR}/neuralnet/Neuron.o \
 	${OBJECTDIR}/neuralnet/algorithms/BackPropagationLearning.o \
 	${OBJECTDIR}/neuralnet/functions/FuncRectifier.o \
+	${OBJECTDIR}/neuralnet/functions/FuncSigmoid.o \
 	${OBJECTDIR}/neuralnet/functions/FuncTanH.o \
+	${OBJECTDIR}/neuralnet/neuron/AbstractNeuron.o \
+	${OBJECTDIR}/neuralnet/neuron/BiasNeuron.o \
+	${OBJECTDIR}/neuralnet/neuron/Neuron.o \
+	${OBJECTDIR}/problem/WeightMatrix.o \
 	${OBJECTDIR}/utils/IdGenerator.o
 
 # Test Directory
@@ -51,18 +55,24 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 
 # Test Files
 TESTFILES= \
+	${TESTDIR}/TestFiles/f3 \
+	${TESTDIR}/TestFiles/f4 \
 	${TESTDIR}/TestFiles/f2 \
 	${TESTDIR}/TestFiles/f1 \
 	${TESTDIR}/TestFiles/f5
 
 # Test Object Files
 TESTOBJECTFILES= \
+	${TESTDIR}/tests/neuralnet/BackPropagationTest.o \
+	${TESTDIR}/tests/neuralnet/BiasNeuronTest.o \
 	${TESTDIR}/tests/neuralnet/Layer_Test.o \
 	${TESTDIR}/tests/neuralnet/MultiLayerPerceptron_Test.o \
 	${TESTDIR}/tests/neuralnet/NetworkPotential_Test.o \
 	${TESTDIR}/tests/neuralnet/layer_runner.o \
+	${TESTDIR}/tests/neuralnet/learning_test.o \
 	${TESTDIR}/tests/neuralnet/multilayerperceptron-runner.o \
-	${TESTDIR}/tests/neuralnet/networkPotential_runner.o
+	${TESTDIR}/tests/neuralnet/networkPotential_runner.o \
+	${TESTDIR}/tests/neuralnet/neuronrunner.o
 
 # C Compiler Flags
 CFLAGS=
@@ -113,11 +123,6 @@ ${OBJECTDIR}/neuralnet/MultiLayerPerceptron.o: neuralnet/MultiLayerPerceptron.cp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/MultiLayerPerceptron.o neuralnet/MultiLayerPerceptron.cpp
 
-${OBJECTDIR}/neuralnet/Neuron.o: neuralnet/Neuron.cpp
-	${MKDIR} -p ${OBJECTDIR}/neuralnet
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/Neuron.o neuralnet/Neuron.cpp
-
 ${OBJECTDIR}/neuralnet/algorithms/BackPropagationLearning.o: neuralnet/algorithms/BackPropagationLearning.cpp
 	${MKDIR} -p ${OBJECTDIR}/neuralnet/algorithms
 	${RM} "$@.d"
@@ -128,10 +133,35 @@ ${OBJECTDIR}/neuralnet/functions/FuncRectifier.o: neuralnet/functions/FuncRectif
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/functions/FuncRectifier.o neuralnet/functions/FuncRectifier.cpp
 
+${OBJECTDIR}/neuralnet/functions/FuncSigmoid.o: neuralnet/functions/FuncSigmoid.cpp
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/functions
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/functions/FuncSigmoid.o neuralnet/functions/FuncSigmoid.cpp
+
 ${OBJECTDIR}/neuralnet/functions/FuncTanH.o: neuralnet/functions/FuncTanH.cpp
 	${MKDIR} -p ${OBJECTDIR}/neuralnet/functions
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/functions/FuncTanH.o neuralnet/functions/FuncTanH.cpp
+
+${OBJECTDIR}/neuralnet/neuron/AbstractNeuron.o: neuralnet/neuron/AbstractNeuron.cpp
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/neuron
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/neuron/AbstractNeuron.o neuralnet/neuron/AbstractNeuron.cpp
+
+${OBJECTDIR}/neuralnet/neuron/BiasNeuron.o: neuralnet/neuron/BiasNeuron.cpp
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/neuron
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/neuron/BiasNeuron.o neuralnet/neuron/BiasNeuron.cpp
+
+${OBJECTDIR}/neuralnet/neuron/Neuron.o: neuralnet/neuron/Neuron.cpp
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/neuron
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/neuron/Neuron.o neuralnet/neuron/Neuron.cpp
+
+${OBJECTDIR}/problem/WeightMatrix.o: problem/WeightMatrix.cpp
+	${MKDIR} -p ${OBJECTDIR}/problem
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/problem/WeightMatrix.o problem/WeightMatrix.cpp
 
 ${OBJECTDIR}/utils/IdGenerator.o: utils/IdGenerator.cpp
 	${MKDIR} -p ${OBJECTDIR}/utils
@@ -145,6 +175,14 @@ ${OBJECTDIR}/utils/IdGenerator.o: utils/IdGenerator.cpp
 .build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
 .build-tests-subprojects:
 
+${TESTDIR}/TestFiles/f3: ${TESTDIR}/tests/neuralnet/BackPropagationTest.o ${TESTDIR}/tests/neuralnet/learning_test.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   `pkg-config --libs cpputest`   `cppunit-config --libs`   
+
+${TESTDIR}/TestFiles/f4: ${TESTDIR}/tests/neuralnet/BiasNeuronTest.o ${TESTDIR}/tests/neuralnet/neuronrunner.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f4 $^ ${LDLIBSOPTIONS}   `pkg-config --libs cpputest`   `cppunit-config --libs`   
+
 ${TESTDIR}/TestFiles/f2: ${TESTDIR}/tests/neuralnet/Layer_Test.o ${TESTDIR}/tests/neuralnet/layer_runner.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   `pkg-config --libs cpputest`   `cppunit-config --libs`   
@@ -156,6 +194,30 @@ ${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/neuralnet/MultiLayerPerceptron_Test.o 
 ${TESTDIR}/TestFiles/f5: ${TESTDIR}/tests/neuralnet/NetworkPotential_Test.o ${TESTDIR}/tests/neuralnet/networkPotential_runner.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f5 $^ ${LDLIBSOPTIONS}   `pkg-config --libs cpputest`   `cppunit-config --libs`   
+
+
+${TESTDIR}/tests/neuralnet/BackPropagationTest.o: tests/neuralnet/BackPropagationTest.cpp 
+	${MKDIR} -p ${TESTDIR}/tests/neuralnet
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/neuralnet/BackPropagationTest.o tests/neuralnet/BackPropagationTest.cpp
+
+
+${TESTDIR}/tests/neuralnet/learning_test.o: tests/neuralnet/learning_test.cpp 
+	${MKDIR} -p ${TESTDIR}/tests/neuralnet
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/neuralnet/learning_test.o tests/neuralnet/learning_test.cpp
+
+
+${TESTDIR}/tests/neuralnet/BiasNeuronTest.o: tests/neuralnet/BiasNeuronTest.cpp 
+	${MKDIR} -p ${TESTDIR}/tests/neuralnet
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/neuralnet/BiasNeuronTest.o tests/neuralnet/BiasNeuronTest.cpp
+
+
+${TESTDIR}/tests/neuralnet/neuronrunner.o: tests/neuralnet/neuronrunner.cpp 
+	${MKDIR} -p ${TESTDIR}/tests/neuralnet
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/neuralnet/neuronrunner.o tests/neuralnet/neuronrunner.cpp
 
 
 ${TESTDIR}/tests/neuralnet/Layer_Test.o: tests/neuralnet/Layer_Test.cpp 
@@ -259,19 +321,6 @@ ${OBJECTDIR}/neuralnet/MultiLayerPerceptron_nomain.o: ${OBJECTDIR}/neuralnet/Mul
 	    ${CP} ${OBJECTDIR}/neuralnet/MultiLayerPerceptron.o ${OBJECTDIR}/neuralnet/MultiLayerPerceptron_nomain.o;\
 	fi
 
-${OBJECTDIR}/neuralnet/Neuron_nomain.o: ${OBJECTDIR}/neuralnet/Neuron.o neuralnet/Neuron.cpp 
-	${MKDIR} -p ${OBJECTDIR}/neuralnet
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/neuralnet/Neuron.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/Neuron_nomain.o neuralnet/Neuron.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/neuralnet/Neuron.o ${OBJECTDIR}/neuralnet/Neuron_nomain.o;\
-	fi
-
 ${OBJECTDIR}/neuralnet/algorithms/BackPropagationLearning_nomain.o: ${OBJECTDIR}/neuralnet/algorithms/BackPropagationLearning.o neuralnet/algorithms/BackPropagationLearning.cpp 
 	${MKDIR} -p ${OBJECTDIR}/neuralnet/algorithms
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/neuralnet/algorithms/BackPropagationLearning.o`; \
@@ -298,6 +347,19 @@ ${OBJECTDIR}/neuralnet/functions/FuncRectifier_nomain.o: ${OBJECTDIR}/neuralnet/
 	    ${CP} ${OBJECTDIR}/neuralnet/functions/FuncRectifier.o ${OBJECTDIR}/neuralnet/functions/FuncRectifier_nomain.o;\
 	fi
 
+${OBJECTDIR}/neuralnet/functions/FuncSigmoid_nomain.o: ${OBJECTDIR}/neuralnet/functions/FuncSigmoid.o neuralnet/functions/FuncSigmoid.cpp 
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/functions
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/neuralnet/functions/FuncSigmoid.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/functions/FuncSigmoid_nomain.o neuralnet/functions/FuncSigmoid.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/neuralnet/functions/FuncSigmoid.o ${OBJECTDIR}/neuralnet/functions/FuncSigmoid_nomain.o;\
+	fi
+
 ${OBJECTDIR}/neuralnet/functions/FuncTanH_nomain.o: ${OBJECTDIR}/neuralnet/functions/FuncTanH.o neuralnet/functions/FuncTanH.cpp 
 	${MKDIR} -p ${OBJECTDIR}/neuralnet/functions
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/neuralnet/functions/FuncTanH.o`; \
@@ -309,6 +371,58 @@ ${OBJECTDIR}/neuralnet/functions/FuncTanH_nomain.o: ${OBJECTDIR}/neuralnet/funct
 	    $(COMPILE.cc) -g -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/functions/FuncTanH_nomain.o neuralnet/functions/FuncTanH.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/neuralnet/functions/FuncTanH.o ${OBJECTDIR}/neuralnet/functions/FuncTanH_nomain.o;\
+	fi
+
+${OBJECTDIR}/neuralnet/neuron/AbstractNeuron_nomain.o: ${OBJECTDIR}/neuralnet/neuron/AbstractNeuron.o neuralnet/neuron/AbstractNeuron.cpp 
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/neuron
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/neuralnet/neuron/AbstractNeuron.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/neuron/AbstractNeuron_nomain.o neuralnet/neuron/AbstractNeuron.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/neuralnet/neuron/AbstractNeuron.o ${OBJECTDIR}/neuralnet/neuron/AbstractNeuron_nomain.o;\
+	fi
+
+${OBJECTDIR}/neuralnet/neuron/BiasNeuron_nomain.o: ${OBJECTDIR}/neuralnet/neuron/BiasNeuron.o neuralnet/neuron/BiasNeuron.cpp 
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/neuron
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/neuralnet/neuron/BiasNeuron.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/neuron/BiasNeuron_nomain.o neuralnet/neuron/BiasNeuron.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/neuralnet/neuron/BiasNeuron.o ${OBJECTDIR}/neuralnet/neuron/BiasNeuron_nomain.o;\
+	fi
+
+${OBJECTDIR}/neuralnet/neuron/Neuron_nomain.o: ${OBJECTDIR}/neuralnet/neuron/Neuron.o neuralnet/neuron/Neuron.cpp 
+	${MKDIR} -p ${OBJECTDIR}/neuralnet/neuron
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/neuralnet/neuron/Neuron.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/neuralnet/neuron/Neuron_nomain.o neuralnet/neuron/Neuron.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/neuralnet/neuron/Neuron.o ${OBJECTDIR}/neuralnet/neuron/Neuron_nomain.o;\
+	fi
+
+${OBJECTDIR}/problem/WeightMatrix_nomain.o: ${OBJECTDIR}/problem/WeightMatrix.o problem/WeightMatrix.cpp 
+	${MKDIR} -p ${OBJECTDIR}/problem
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/problem/WeightMatrix.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/problem/WeightMatrix_nomain.o problem/WeightMatrix.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/problem/WeightMatrix.o ${OBJECTDIR}/problem/WeightMatrix_nomain.o;\
 	fi
 
 ${OBJECTDIR}/utils/IdGenerator_nomain.o: ${OBJECTDIR}/utils/IdGenerator.o utils/IdGenerator.cpp 
@@ -328,6 +442,8 @@ ${OBJECTDIR}/utils/IdGenerator_nomain.o: ${OBJECTDIR}/utils/IdGenerator.o utils/
 .test-conf:
 	@if [ "${TEST}" = "" ]; \
 	then  \
+	    ${TESTDIR}/TestFiles/f3 || true; \
+	    ${TESTDIR}/TestFiles/f4 || true; \
 	    ${TESTDIR}/TestFiles/f2 || true; \
 	    ${TESTDIR}/TestFiles/f1 || true; \
 	    ${TESTDIR}/TestFiles/f5 || true; \

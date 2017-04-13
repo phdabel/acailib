@@ -9,14 +9,15 @@
 #define IABSTRACTLAYER_H
 
 #include <vector>
-#include "Neuron.h"
+#include "neuron/AbstractNeuron.h"
 
 using namespace std;
 
 class IAbstractLayer {
 public:
-    virtual vector<Neuron*> getNeurons() = 0;
-    virtual void addNeuron(Neuron *neuron) = 0;
+    virtual vector<AbstractNeuron*> getNeurons() = 0;
+    virtual void addNeuron(AbstractNeuron *neuron) = 0;
+    virtual AbstractNeuron& getNeuron(int i) = 0;
     virtual ~IAbstractLayer(){};
 private:
 };

@@ -19,8 +19,8 @@ public:
     virtual void setLearningRate(double lrt) = 0;
     virtual double getLearningRate() = 0;
     virtual void run() = 0;
+    virtual void setNetwork(INeuralNetwork* network) = 0;
     virtual INeuralNetwork* getNetwork() = 0;
-    virtual void setNetwork(INeuralNetwork* net) = 0;
 protected:
     virtual void learn() = 0;
 private:

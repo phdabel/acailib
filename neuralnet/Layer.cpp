@@ -6,7 +6,7 @@
  */
 
 #include "Layer.h"
-#include "Neuron.h"
+#include "neuron/AbstractNeuron.h"
 #include <vector>
 #include <map>
 #include "../core/ObjectID.h"
@@ -27,12 +27,29 @@ Layer::Layer(const Layer& orig) {
 Layer::~Layer() {
 }
 
-void Layer::addNeuron(Neuron* neuron){
+void Layer::addNeuron(AbstractNeuron* neuron){
     this->neurons.insert(make_pair(&neuron->getId(),neuron));
 }
 
-vector<Neuron*> Layer::getNeurons(){
-    vector<Neuron*> nL;
+AbstractNeuron& Layer::getNeuron(int i){
+    AbstractNeuron* tmp = NULL;
+    for(auto &n : this->neurons){
+        if(n.first->getValue() == i){
+            tmp = n.second;
+            break;
+        }
+    }
+    if(tmp == NULL){
+        throw runtime_error("There is no neuron with the informed ID in the layer.");
+    }
+    return *tmp;
+}
+
+/**
+ * 
+ */
+vector<AbstractNeuron*> Layer::getNeurons(){
+    vector<AbstractNeuron*> nL;
     for(auto &n : this->neurons){
         nL.push_back(n.second);
     }

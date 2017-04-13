@@ -6,7 +6,7 @@
  */
 
 #include "Layer_Test.h"
-#include "../../neuralnet/Neuron.h"
+#include "../../neuralnet/neuron/Neuron.h"
 #include "../../core/Edge.h"
 #include "../../core/ObjectID.h"
 #include "../../neuralnet/functions/FuncTanH.h"
@@ -56,8 +56,8 @@ void Layer_Test::setUp() {
     this->edi2y1.setId(&this->ei2y1);
     
     //values of the bias neurons (input and hidden layer)
-    this->x0.setValue(1.0);
-    this->i0.setValue(1.0);
+    //this->x0.setValue(1.0);
+    //this->i0.setValue(1.0);
     
     //values of input neurons
     this->x1.setValue(1.0);
@@ -101,59 +101,59 @@ void Layer_Test::setUp() {
     this->i2.setFunction(this->fTH);
     this->y1.setFunction(this->fTH);
 
+    //indexes
+    //this->x0.setIndex("0");
+    this->x1.setIndex("1");
+    this->x2.setIndex("2");
+    //this->i0.setIndex("0");
+    this->i1.setIndex("1");
+    this->i2.setIndex("2");
+    this->y1.setIndex("0");
+    
+    this->inputL = new Layer;
+    this->hiddenL = new Layer;
+    this->outputL = new Layer;
+    
+    this->inputL->setType(LayerType::INPUT);
+    this->hiddenL->setType(LayerType::HIDDEN);
+    this->outputL->setType(LayerType::OUTPUT);
+    
+    this->inputL->addNeuron(&this->x0);
+    this->inputL->addNeuron(&this->x1);
+    this->inputL->addNeuron(&this->x2);
+    
+    this->hiddenL->addNeuron(&this->i0);
+    this->hiddenL->addNeuron(&this->i1);
+    this->hiddenL->addNeuron(&this->i2);
+    
+    this->outputL->addNeuron(&this->y1);
+    
 }
 
 void Layer_Test::tearDown() {
+    delete this->inputL;
+    delete this->hiddenL;
+    delete this->outputL;
 }
 
 void Layer_Test::testInsertNeurons() {
-    Layer inputL;
-    Layer hiddenL;
-    Layer outputL;
-    inputL.setType(LayerType::INPUT);
-    hiddenL.setType(LayerType::HIDDEN);
-    outputL.setType(LayerType::OUTPUT);
-    inputL.addNeuron(&this->x0);
-    inputL.addNeuron(&this->x1);
-    inputL.addNeuron(&this->x2);
     
-    hiddenL.addNeuron(&this->i0);
-    hiddenL.addNeuron(&this->i1);
-    hiddenL.addNeuron(&this->i2);
-    
-    outputL.addNeuron(&this->y1);
-    
-    CPPUNIT_ASSERT(inputL.getNeurons().size() == 3);
-    CPPUNIT_ASSERT(hiddenL.getNeurons().size() == 3);
-    CPPUNIT_ASSERT(outputL.getNeurons().size() == 1);
+    CPPUNIT_ASSERT(this->inputL->getNeurons().size() == 3);
+    CPPUNIT_ASSERT(this->hiddenL->getNeurons().size() == 3);
+    CPPUNIT_ASSERT(this->outputL->getNeurons().size() == 1);
     
 }
 
+
 void Layer_Test::testNeuronValueUpdate(){
-    
-    Layer inputL;
-    Layer hiddenL;
-    Layer outputL;
-    inputL.setType(LayerType::INPUT);
-    hiddenL.setType(LayerType::HIDDEN);
-    outputL.setType(LayerType::OUTPUT);
-    inputL.addNeuron(&this->x0);
-    inputL.addNeuron(&this->x1);
-    inputL.addNeuron(&this->x2);
-    
-    hiddenL.addNeuron(&this->i0);
-    hiddenL.addNeuron(&this->i1);
-    hiddenL.addNeuron(&this->i2);
-    
-    outputL.addNeuron(&this->y1);
-    
+
     //check current values
     CPPUNIT_ASSERT(this->x0.getValue() == 1.0);
     CPPUNIT_ASSERT(this->x1.getValue() == 1.0);
     CPPUNIT_ASSERT(this->x2.getValue() == -1.0);
     CPPUNIT_ASSERT(this->y1.getValue() == 1.0);
     //check pointers
-    for(auto &neuron: inputL.getNeurons()){
+    for(auto &neuron: this->inputL->getNeurons()){
         if(neuron->getId().equals(this->x0.getId())){
             CPPUNIT_ASSERT(neuron->getValue() == this->x0.getValue());
         }
@@ -166,19 +166,19 @@ void Layer_Test::testNeuronValueUpdate(){
     }
     
     //check pointers of the output layer
-    for(auto &neuron: outputL.getNeurons()){
+    for(auto &neuron: this->outputL->getNeurons()){
         if(neuron->getId().equals(this->y1.getId())){
             CPPUNIT_ASSERT(neuron->getValue() == this->y1.getValue());
         }
     }
     
     //update values
-    this->x0.setValue(1.0);
+    //this->x0.setValue(1.0);
     this->x1.setValue(-1.0);
     this->x2.setValue(1.0);
     this->y1.setValue(-1.0);
     //checking pointers
-    for(auto &neuron: inputL.getNeurons()){
+    for(auto &neuron: this->inputL->getNeurons()){
         if(neuron->getId().equals(this->x0.getId())){
             CPPUNIT_ASSERT(neuron->getValue() == this->x0.getValue());
         }
@@ -190,7 +190,7 @@ void Layer_Test::testNeuronValueUpdate(){
         }
     }
     //check pointers of the output layer
-    for(auto &neuron: outputL.getNeurons()){
+    for(auto &neuron: this->outputL->getNeurons()){
         if(neuron->getId().equals(this->y1.getId())){
             CPPUNIT_ASSERT(neuron->getValue() == this->y1.getValue());
         }
@@ -199,27 +199,12 @@ void Layer_Test::testNeuronValueUpdate(){
 
 void Layer_Test::testEvaluateLayers(){
     
-    Layer inputL;
-    Layer hiddenL;
-    Layer outputL;
-    inputL.setType(LayerType::INPUT);
-    hiddenL.setType(LayerType::HIDDEN);
-    outputL.setType(LayerType::OUTPUT);
-    inputL.addNeuron(&this->x0);
-    inputL.addNeuron(&this->x1);
-    inputL.addNeuron(&this->x2);
-    
-    hiddenL.addNeuron(&this->i0);
-    hiddenL.addNeuron(&this->i1);
-    hiddenL.addNeuron(&this->i2);
-    
-    outputL.addNeuron(&this->y1);
     clock_t start;
     double duration;
     
     cout << "evaluation of the neurons of the input layer" << endl;
     //evaluate input layer neurons
-    for(auto &neuron: inputL.getNeurons()){
+    for(auto &neuron: this->inputL->getNeurons()){
         if(neuron->getId().equals(this->x0.getId())){
             start = clock();
             CPPUNIT_ASSERT(neuron->eval() == 1.0);
@@ -245,7 +230,7 @@ void Layer_Test::testEvaluateLayers(){
     
     cout << "evaluation of the neurons of the hidden layer" << endl;
     //evaluate hidden layer neurons
-    for(auto &neuron: hiddenL.getNeurons()){
+    for(auto &neuron: this->hiddenL->getNeurons()){
         if(neuron->getId().equals(this->i0.getId())){
             start = clock();
             CPPUNIT_ASSERT(neuron->eval() == 1.0);
@@ -271,7 +256,7 @@ void Layer_Test::testEvaluateLayers(){
     
     cout << "evaluation of the neurons of the output layer" << endl;
     //evaluate output layer neurons
-    for(auto &neuron : outputL.getNeurons()){
+    for(auto &neuron : this->outputL->getNeurons()){
         
         if(neuron->getId().equals(this->y1.getId())){
             start = clock();
@@ -282,4 +267,53 @@ void Layer_Test::testEvaluateLayers(){
         }
     }
     
+}
+
+void Layer_Test::testGetNeuron(){
+    
+    AbstractNeuron* tmp = NULL;
+    tmp = &this->inputL->getNeuron(49);
+    cout << "id_tmp " << tmp->getIndex() << endl;
+    for(auto &neuron : this->inputL->getNeurons()){
+        cout << "id " << neuron->getIndex() << endl;
+        if(neuron->getId().getValue() == 49){
+            CPPUNIT_ASSERT(tmp == neuron);
+        }
+    }
+    
+}
+
+void Layer_Test::testGetEdge(){
+   
+    //some neuron from the hidden layer
+    AbstractNeuron* tmpN = NULL;
+    //some edge of the hidden layer neuron
+    Edge* tmpE = NULL;
+    tmpN = &this->hiddenL->getNeuron(69);
+    
+    for(auto &neuron : this->hiddenL->getNeurons()){
+        //cout << "neuron id " << neuron->getId().getValue() << endl;
+        if(neuron->getId().getValue() == 69){
+            CPPUNIT_ASSERT(tmpN == neuron);
+        }
+    }
+    
+    tmpE = &tmpN->getEdge(72);
+    for(auto &edge : this->hiddenL->getNeuron(69).getEdges()){
+        //cout << "edge id " << edge->getId().getValue() << endl;
+        if(edge->getId().getValue() == 72){
+            CPPUNIT_ASSERT(tmpE == edge);
+        }
+    }
+    //neuron of the previous layer (input)
+    AbstractNeuron* tmpM = NULL;
+    tmpM = (AbstractNeuron*) &tmpE->getVertex1(); //neuron must be cast from an IUnit
+    
+    for(auto &neuron : this->inputL->getNeurons()){
+        if(neuron->getId().getValue() == tmpM->getId().getValue()){
+            CPPUNIT_ASSERT(neuron == tmpM);
+        }
+    }
+    
+
 }
