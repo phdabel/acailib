@@ -71,4 +71,4 @@ Outros modelos podem ser desenvolvidos como colaboração para estudantes e pesq
 Modelagem
 ----------
 
-![alt tag](http://gitlab.dev.ufrgs.br/abel/acai-lib/raw/59f1ee8c3a265ab6edc5f1e8ed26cc42ace722a5/project-uml/ACAI-LIB.png)
+![alt tag](http://gitlab.dev.ufrgs.br/abel/acai-lib/raw/master/project-uml/ACAI-LIB.png)
