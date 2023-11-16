@@ -11,15 +11,13 @@ Requisitos
 ------------
 
 A biblioteca é escrita na linguagem C++11 e os testes unitários realizados com a biblioteca CPPUNIT.
-Recomenda-se que o desenvolvimento seja feito em ambiente Linux.
-Abra o projeto na IDE de sua preferência, recomenda-se o NetBeans. 
 
 Instalação
 ------------
 
 Faça o checkout desse repositório no seu computador:
 
-    git clone http://gitlab.dev.ufrgs.br/abel/acai-lib.git
+    git clone https://github.com/phdabel/acailib.git
 
 O projeto tem a seguinte estrutura de pastas:
 
@@ -43,9 +41,6 @@ Esses passos deverão ser feitos a primeira vez que você contribuir.
 
 ### 1. [Fork](http://help.github.com/fork-a-repo/) o repositório do ACAI-LIB no GitLAB e clone seu fork to seu ambiente de desenvolvimento.
 
-```
-git clone git@gitlab.dev.ufrgs.br:USERNAME@cpd.ufrgs.br/acai-lib.git
-```
 
 Se tiver problemas para configurar o Git com o GitLAB no Linux, ou está recebendo erros como "Permission Denied (publickey)", então você deve
 [configurar sua instalação do Git para trabalhar com o GitLAB](http://help.github.com/linux-set-up-git/)
@@ -60,15 +55,8 @@ Sugere-se que cada módulo novo que for desenvolvido tenha um teste unitário pa
 Por exemplo, a rede neural Multi Layer Perceptron possui testes da montagem da rede, propagação dos valores de entrada até a saída da rede e retro-propagação do erro.
 Dessa forma pode-se verificar que a rede está funcionando conforme o esperado.
 
-Próximos passos
-===============
-
-Como o projeto é novo apenas a rede neural MLP e o algoritmo backpropagation foram desenvolvidos até o momento.
-O próximo passo é o desenvolvimento da rede neural Long Short-Term Memory que será utilizada para implementação do [método sec2sec, "Sequence to sequence learning with neural networks"](https://projetos.cpd.ufrgs.br/documents/690) no desenvolvimento de um robô de conversação para o Centro de Processamento de Dados.
-
-Outros modelos podem ser desenvolvidos como colaboração para estudantes e pesquisadores das áreas afins.
 
 Modelagem
 ----------
 
-![alt tag](http://gitlab.dev.ufrgs.br/abel/acai-lib/raw/master/project-uml/ACAI-LIB.png)
+![alt tag](https://github.com/phdabel/acailib/raw/main/project-uml/ACAI-LIB.png)
