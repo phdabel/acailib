@@ -1,23 +1,26 @@
-ACAI-LIB - AC Artificial Intelligence Library
-=============================================
+# ACAI-LIB - AC Artificial Intelligence Library
 
-Esse é o repositório da ACAI-LIB, uma biblioteca modular para aprendizado de máquina para C++11.
-Seu objetivo é oferecer algoritmos flexíveis e de uso fácil para tarefas de aprendizagem de máquina em uma variedade de ambientes pre-definidos.
+## Sobre a ACAI-LIB
 
-A ACAI-LIB ainda está em desenvolvimento e deverá conter algoritmos para redes neurais (Multi Layer Perceptron - MLP, Self-Organizing Map - SOM, GrowingSOM - GSOM, entre outros), Redes Bayesianas, Modelos Ocultos de Markov, Grafos-fator e outros modelos gráficos bem como seus algoritmos de inferência.
+A *ACAI-LIB* é uma biblioteca modular de aprendizado de máquina para C++11. Seu foco está em oferecer algoritmos flexíveis e de fácil uso para uma variedade de tarefas de aprendizado de máquina, em ambientes pré-definidos. Atualmente em desenvolvimento, a biblioteca planeja incluir:
 
+- Redes Neurais (Multi Layer Perceptron - MLP, Self-Organizing Map - SOM, GrowingSOM - GSOM, etc.)
+- Redes Bayesianas
+- Modelos Ocultos de Markov
+- Grafos-fator e outros modelos gráficos
+- Algoritmos de inferência correspondentes
 
-Requisitos
-------------
+## Requisitos
 
-A biblioteca é escrita na linguagem C++11 e os testes unitários realizados com a biblioteca CPPUNIT.
+- **Linguagem:** C++11
+- **Testes Unitários:** CPPUNIT
 
-Instalação
-------------
+## Instalação
 
-Faça o checkout desse repositório no seu computador:
+Clone o repositório para sua máquina local:
 
-    git clone https://github.com/phdabel/acailib.git
+```bash
+git clone https://github.com/phdabel/acailib.git
 
 O projeto tem a seguinte estrutura de pastas:
 
@@ -27,25 +30,6 @@ O projeto tem a seguinte estrutura de pastas:
 - utils -> classes utilitárias;
 - project-uml -> arquivo do projeto no ASTAH (diagramas de classes e outras ferramentas do UML).
 
-
-Como colaborar
-===============
-
-Você quer contribuir para o projeto ACAI-LIB? Ótimo! Mas para aumentar as chances de suas mudanças serem aceitas rapidamente, siga os seguintes passos.
-
-Prepare seu ambiente de desenvolvimento
-----------------------------------------
-
-Os seguintes passos criarão um ambiente de desenvolvimento que você utilizará para trabalhar.
-Esses passos deverão ser feitos a primeira vez que você contribuir.
-
-### 1. [Fork](http://help.github.com/fork-a-repo/) o repositório do ACAI-LIB no GitLAB e clone seu fork to seu ambiente de desenvolvimento.
-
-
-Se tiver problemas para configurar o Git com o GitLAB no Linux, ou está recebendo erros como "Permission Denied (publickey)", então você deve
-[configurar sua instalação do Git para trabalhar com o GitLAB](http://help.github.com/linux-set-up-git/)
-
-> Dica: se você não é fluente com GIT, recomenda-se a leitura do excelente livro gratuito [Pro Git](https://git-scm.com/book/en/v2). Também há livros de GIT disponíveis na pasta de livros do CPD.
 
 ### Unit tests
 
