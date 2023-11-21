@@ -45,3 +45,43 @@ Modelagem
 ----------
 
 ![alt tag](https://github.com/phdabel/acailib/raw/main/project-uml/ACAI-LIB.png)
+
+## Como Contribuir
+
+Estamos entusiasmados com sua contribuição ao *ACAI-LIB*! Aqui estão algumas diretrizes para ajudá-lo a começar:
+
+### 1. Relatar Bugs e Sugerir Melhorias
+
+Se você encontrar um bug ou tiver uma ideia para uma melhoria, por favor, abra uma issue no GitHub. Inclua o máximo de detalhes possível, como:
+
+- Descrição do bug ou da melhoria.
+- Passos para reproduzir o bug.
+- Sugestões para possíveis soluções.
+
+### 2. Enviar Pull Requests
+
+Se você deseja adicionar uma nova funcionalidade ou corrigir um bug, siga estes passos:
+
+1. Faça um fork do repositório.
+2. Crie uma branch para suas mudanças (`git checkout -b feature/minha-nova-feature`).
+3. Faça suas alterações e adicione testes se aplicável.
+4. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`).
+5. Push para a branch (`git push origin feature/minha-nova-feature`).
+6. Abra um Pull Request no GitHub.
+
+### 3. Melhorar a Documentação
+
+A documentação é tão importante quanto o código. Se você notar algo que pode ser melhorado ou se tem sugestões para novos conteúdos, sinta-se livre para contribuir.
+
+### 4. Contribuir com Testes
+
+Testes robustos são essenciais para garantir a estabilidade e a qualidade da biblioteca. Contribuições na forma de novos testes ou melhorias nos existentes são sempre bem-vindas.
+
+### 5. Discutir Ideias
+
+Se você tem ideias para novas features ou melhorias, não hesite em compartilhá-las na seção de issues. A discussão aberta é essencial para o desenvolvimento colaborativo.
+
+### 6. Divulgar o Projeto
+
+Ajude a aumentar a visibilidade do projeto compartilhando-o
+
