@@ -21,6 +21,7 @@ Clone o repositório para sua máquina local:
 
 ```bash
 git clone https://github.com/phdabel/acailib.git
+```
 
 O projeto tem a seguinte estrutura de pastas:
 
