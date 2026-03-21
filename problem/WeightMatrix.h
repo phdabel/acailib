@@ -9,6 +9,7 @@
 #define WEIGHTMATRIX_H
 
 #include "IMatrix.h"
+#include <cstddef>
 
 class WeightMatrix: public IMatrix {
 public:

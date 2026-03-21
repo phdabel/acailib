@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   main.cpp
  * Author: sim
  *
@@ -8,106 +8,91 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <typeinfo>
-#include <string>
-#include <map>
+#include <sstream>
+#include <vector>
 
-#include "neuralnet/neuron/Neuron.h"
-#include "core/UnitType.h"
-#include "./utils/IdGenerator.h"
-#include "./core/ObjectID.h"
-#include "./core/Edge.h"
-#include "./neuralnet/functions/FuncTanH.h"
-#include "./neuralnet/functions/FuncSigmoid.h"
 #include "./neuralnet/MultiLayerPerceptron.h"
 #include "./neuralnet/algorithms/BackPropagationLearning.h"
-#include <vector>
+#include "./neuralnet/functions/FuncSigmoid.h"
+#include "./core/UnitType.h"
 
 using namespace std;
 
-static string getType(UnitType type);
-
 int main(int argc, char** argv) {
-    
+
+    // Lê dados de treino do arquivo
+    vector<vector<double>> inputs;
+    vector<vector<double>> targets;
+
+    ifstream dataFile("data/xor.dat");
+    if (!dataFile.is_open()) {
+        cerr << "Erro: não foi possível abrir data/xor.dat" << endl;
+        return 1;
+    }
+
+    string line;
+    while (getline(dataFile, line)) {
+        if (line.empty()) continue;
+        istringstream iss(line);
+        vector<double> row;
+        double val;
+        while (iss >> val) row.push_back(val);
+        if (row.empty()) continue;
+        // Última coluna é o alvo; demais são entradas
+        targets.push_back({row.back()});
+        row.pop_back();
+        inputs.push_back(row);
+    }
+    dataFile.close();
+
+    int nInputs = (int)inputs[0].size();
 
     FuncSigmoid fs;
-    BackPropagationLearning learning;
     MultiLayerPerceptron mlp{&fs};
+
+    // Arquitetura: nInputs entradas, 4 ocultos, 1 saída
+    vector<int> arch{nInputs, 4, 1};
+    mlp.configure(arch);
+
+    BackPropagationLearning learning;
     learning.setNetwork(&mlp);
-    
-    vector<int> n{2,3,1};
-//    n.push_back(2);
-//    n.push_back(3);
-//    n.push_back(1);
-    
-    mlp.configure(n);
-    cout << mlp.getLayer(0)->getNeuron(1).getId().getValue() << endl;
-    
-    int **matrix;
-    int row = 5;
-    int col = 10;
-    //dynamically allocate an array
-    matrix = new int *[row];
-    for(int count = 0; count < row; count++){
-        matrix[count] = new int[col];
-    }
-    
-    //input element for matrix
-    cout << endl << "Now enter the element for the matrix...";
-    for(int i = 0; i < row; i++){
-        for(int j = 0; j < col; j++){
-            cout << endl << "Row " << (i+1) << " col " << (j+1) << " :";
-            matrix[i][j] = 0;
+    learning.setLearningRate(0.5);
+    learning.setIterations(10000);
+    learning.setTrainingData(inputs, targets);
+
+    cout << "Treinando rede com " << inputs.size()
+         << " amostras por 10000 iterações..." << endl;
+    learning.run();
+    cout << "Treinamento concluído." << endl << endl;
+
+    // Avalia cada amostra
+    cout << "Resultados:" << endl;
+    int nLayers = mlp.countLayers();
+    for (int s = 0; s < (int)inputs.size(); s++) {
+        Layer* inputLayer = mlp.getLayer(0);
+        vector<AbstractNeuron*> inputNeurons = inputLayer->getNeurons();
+        int idx = 0;
+        for (auto &n : inputNeurons) {
+            if (n->getType() == UnitType::BIAS) continue;
+            n->setValue(inputs[s][idx++]);
         }
+        int time = 99990 + s;
+        for (int l = 1; l < nLayers; l++) {
+            for (auto &n : mlp.getLayer(l)->getNeurons()) {
+                if (n->getType() == UnitType::BIAS) continue;
+                n->eval(time);
+            }
+        }
+        double output = mlp.getLayer(nLayers - 1)->getNeurons()[0]->getValue();
+
+        cout << "  XOR(";
+        for (int i = 0; i < (int)inputs[s].size(); i++) {
+            if (i) cout << ", ";
+            cout << inputs[s][i];
+        }
+        cout << ") = " << output
+             << "  (esperado: " << targets[s][0] << ")" << endl;
     }
-    
-    
-    
-    
-//    string line;
-//    ifstream myfile ("data/xor.dat");
-//    
-//    if(myfile.is_open()){
-//        while(getline(myfile,line)){
-//            
-//            size_t next, last = 0;
-//            string token;
-//            while((next = line.find(" ",last)) != string::npos){
-//                token = line.substr(last,next-last);
-//                cout << token << endl;
-//                last = next + 1;
-//            }
-//            
-//            cout << line << endl;
-//        }
-//        myfile.close();
-//    }else{
-//        cout << "Unable to open file." << endl;
-//    }
-    
-    /* how to cast from IUnit to Neuron */
-    //Neuron *tmpN1;
-    //tmpN1 = (Neuron*) &ed1.getVertex1();
-    /* end of this fu¢#ing s#|t */
-    
-    
-            
+
     return 0;
-}
-
-
-static std::string getType(UnitType type){
-    switch(type){
-        case 0:
-            return "Node";
-        case 1:
-            return "Factor";
-        case 2:
-            return "Potential";
-        case 3:
-            return "Neuron";            
-        case 4:
-            return "Edge";
-                    
-    }
 }

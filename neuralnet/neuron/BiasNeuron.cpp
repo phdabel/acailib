@@ -6,6 +6,8 @@
  */
 
 #include "BiasNeuron.h"
+#include <stdexcept>
+using namespace std;
 
 BiasNeuron::BiasNeuron() {
     AbstractNeuron::setType(UnitType::BIAS);

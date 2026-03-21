@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build acailib",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++11",
+                "-g",
+                "-o", "${workspaceFolder}/acailib",
+                "${workspaceFolder}/main.cpp",
+                "${workspaceFolder}/core/Edge.cpp",
+                "${workspaceFolder}/core/ObjectID.cpp",
+                "${workspaceFolder}/neuralnet/Layer.cpp",
+                "${workspaceFolder}/neuralnet/MultiLayerPerceptron.cpp",
+                "${workspaceFolder}/neuralnet/algorithms/BackPropagationLearning.cpp",
+                "${workspaceFolder}/neuralnet/functions/FuncRectifier.cpp",
+                "${workspaceFolder}/neuralnet/functions/FuncSigmoid.cpp",
+                "${workspaceFolder}/neuralnet/functions/FuncTanH.cpp",
+                "${workspaceFolder}/neuralnet/neuron/AbstractNeuron.cpp",
+                "${workspaceFolder}/neuralnet/neuron/BiasNeuron.cpp",
+                "${workspaceFolder}/neuralnet/neuron/Neuron.cpp",
+                "${workspaceFolder}/problem/WeightMatrix.cpp",
+                "${workspaceFolder}/utils/IdGenerator.cpp"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        }
+    ]
+}

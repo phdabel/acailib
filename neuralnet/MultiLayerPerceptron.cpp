@@ -8,6 +8,7 @@
 #include "MultiLayerPerceptron.h"
 #include "Layer.h"
 #include "LayerType.h"
+#include "../core/UnitType.h"
 #include "neuron/Neuron.h"
 #include "neuron/BiasNeuron.h"
 #include "../core/ObjectID.h"
@@ -125,14 +126,15 @@ void MultiLayerPerceptron::setNeurons(Layer *l, int n){
 void MultiLayerPerceptron::setEdges(bool randomWeight){
     for(int l = (this->countLayer-1); l > 0; l--){
         for(auto &n2 : this->getLayer(l)->getNeurons()){
+            if(n2->getType() == UnitType::BIAS) continue;
             for(auto &n1 : this->getLayer(l-1)->getNeurons()){
                 ObjectID * o = new ObjectID;
-                Edge e {*n1,*n2};
-                e.setId(o);
+                Edge *e = new Edge(*n1, *n2);
+                e->setId(o);
                 if(randomWeight){
-                    e.setWeight(o->random());
+                    e->setWeight(o->random());
                 }
-                n2->addEdge(&e);
+                n2->addEdge(e);
             }
         }
     }

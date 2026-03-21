@@ -13,6 +13,7 @@
 #include "../Layer.h"
 #include "../neuron/Neuron.h"
 #include "../MultiLayerPerceptron.h"
+#include <vector>
 
 class BackPropagationLearning: public ILearningAlgorithm<MultiLayerPerceptron> {
 public:
@@ -28,17 +29,24 @@ public:
     void run() override;
     void setNetwork(MultiLayerPerceptron* network) override;
     MultiLayerPerceptron* getNetwork() override;
+    void setTrainingData(std::vector<std::vector<double>> &inputs,
+                         std::vector<std::vector<double>> &targets);
 protected:
     void learn() override;
 private:
     MultiLayerPerceptron* network;
     int iterations = 0;
-    double learningRate = 0.0;
+    double learningRate = 0.1;
     double squaredError = 0.0;
     double meanSquaredError = 0.0;
+    int currentTime = 0;
+    std::vector<std::vector<double>> inputData;
+    std::vector<std::vector<double>> targetData;
+    std::vector<double> currentInputs;
+    std::vector<double> currentTargets;
     void propagate();
     void backpropagate();
-    
+
 };
 
 #endif /* BACKPROPAGATIONLEARNING_H */

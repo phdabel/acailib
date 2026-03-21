@@ -7,6 +7,7 @@
 
 #include "Layer.h"
 #include "neuron/AbstractNeuron.h"
+#include <stdexcept>
 #include <vector>
 #include <map>
 #include "../core/ObjectID.h"
