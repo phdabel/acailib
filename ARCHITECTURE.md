@@ -18,7 +18,7 @@ acailib/
 │   ├── INeuralNetwork.h     # Interface da rede
 │   ├── IAbstractLayer.h     # Interface de camada
 │   └── LayerType.h          # Enum de tipos de camada
-├── problem/                 # WeightMatrix (incompleto)
+├── problem/                 # WeightMatrix (matriz de pesos por camada)
 ├── utils/                   # IdGenerator (singleton)
 ├── tests/                   # Testes unitários CppUnit
 ├── data/                    # Datasets (xor.dat)
@@ -39,7 +39,8 @@ IUnit
 INeuralNetwork<Layer>
  └── MultiLayerPerceptron
       ├── Layer  (1..*)
-      │    └── AbstractNeuron  (1..*)
+      │    ├── AbstractNeuron  (1..*)
+      │    └── WeightMatrix    (1, exceto camada de entrada)
       └── IActivationFunction
 
 ILearningAlgorithm<MultiLayerPerceptron>
@@ -158,7 +159,7 @@ enum LayerType { INPUT, HIDDEN, OUTPUT };
 #### `Layer`
 > `neuralnet/Layer.h` | `neuralnet/Layer.cpp`
 
-Implementa `IAbstractLayer`. Armazena neurônios num `map<ObjectID*, AbstractNeuron*>` ordenado por ID.
+Implementa `IAbstractLayer`. Armazena neurônios num `map<ObjectID*, AbstractNeuron*>` ordenado por ID. Cada camada (exceto a de entrada) possui uma `WeightMatrix` que centraliza todos os pesos de conexão com a camada anterior.
 
 | Método | Descrição |
 |--------|-----------|
@@ -168,6 +169,11 @@ Implementa `IAbstractLayer`. Armazena neurônios num `map<ObjectID*, AbstractNeu
 | `void addNeuron(AbstractNeuron*)` | Insere neurônio no mapa |
 | `vector<AbstractNeuron*> getNeurons()` | Todos os neurônios em ordem de ID |
 | `AbstractNeuron& getNeuron(int i)` | Neurônio pelo índice ordinal |
+| `void initWeights(int prevNeuronCount, bool random)` | Cria a `WeightMatrix` desta camada: `rows` = neurônios não-bias desta camada, `cols` = todos os neurônios da camada anterior (incluindo bias). Se `random=true`, chama `randomize()`. |
+| `void forward(Layer* prev)` | Forward pass: para cada neurônio não-bias `nj` (índice `j`), calcula `net_j = Σ_i W[j][i] * x_i`, depois `out_j = f(net_j)`. Chama `setNet()` e `setValue()` no neurônio. |
+| `WeightMatrix* getWeights()` | Retorna ponteiro para a `WeightMatrix` desta camada |
+
+> **Convenção de índices:** `W[j][i]` — linha `j` indexa o j-ésimo neurônio não-bias da camada atual; coluna `i` indexa o i-ésimo neurônio (incluindo bias) da camada anterior.
 
 ---
 
@@ -176,26 +182,22 @@ Implementa `IAbstractLayer`. Armazena neurônios num `map<ObjectID*, AbstractNeu
 #### `AbstractNeuron`
 > `neuralnet/neuron/AbstractNeuron.h` | `.cpp`
 
-Classe base abstrata para neurônios. Implementa `IUnit` e toda a lógica de forward pass.
+Classe base abstrata para neurônios. Implementa `IUnit`. Na arquitetura baseada em `WeightMatrix`, o neurônio não armazena mais arestas nem calcula seu próprio net input — esse cálculo é delegado a `Layer::forward()`. O neurônio expõe `net` e `value` para que o algoritmo de aprendizado acesse os valores intermediários.
 
 | Membro | Tipo | Descrição |
 |--------|------|-----------|
 | `delta` | `double` | Gradiente local δ (usado no backprop) |
 | `error` | `double` | Erro do neurônio (usado no backprop) |
-| `edges` | `vector<Edge*>` | Arestas de entrada |
-| `timeCache` | `int` | Último instante de avaliação (evita recomputação) |
+| `net` | `double` | Net input antes da ativação (definido por `Layer::forward()`) |
 
 | Método | Descrição |
 |--------|-----------|
-| `double eval(int time=0)` | Se não tem arestas: retorna `getValue()`. Caso contrário: calcula `f(net)` e armazena em `value`. Usa cache por `time`. |
-| `double computeNetwork()` | Soma `edge->eval()` para todas as arestas: Σ(wᵢ · xᵢ) |
-| `void addEdge(Edge*)` | Adiciona aresta de entrada |
-| `vector<Edge*> getEdges()` | Retorna lista de arestas |
-| `Edge& getEdge(int id)` | Busca aresta por ID |
+| `double eval(int time=0)` | Retorna `getValue()` (usado na camada de entrada; nas demais camadas, `forward()` é quem atualiza o valor) |
 | `void setFunction(IActivationFunction&)` | Define função de ativação |
 | `IActivationFunction& getFunction()` | Retorna função de ativação |
 | `double getDelta()` / `setDelta(double)` | Getter/setter de δ |
 | `double getError()` / `setError(double)` | Getter/setter de erro |
+| `double getNet()` / `setNet(double)` | Getter/setter do net input (pré-ativação) |
 | `virtual double getValue()` | Valor de saída do neurônio (abstrato) |
 | `virtual void setValue(double)` | Define valor de saída (abstrato) |
 
@@ -291,7 +293,7 @@ Interface genérica parametrizada pelo tipo de camada `T`.
 | *(protected)* `bool checkNetworkConstraints()` | Valida restrições estruturais |
 | *(protected)* `void addLayer(T*)` | Adiciona camada |
 | *(protected)* `void setNeurons(T*, int)` | Popula camada com neurônios |
-| *(protected)* `void setEdges(bool)` | Cria arestas entre camadas |
+| *(protected)* `void initWeights(bool)` | Inicializa a `WeightMatrix` de cada camada (exceto a de entrada) |
 | *(protected)* `void setSumSquaredError()` | ⚠️ Não implementado |
 | *(protected)* `void setMeanSquaredError()` | ⚠️ Não implementado |
 
@@ -306,7 +308,7 @@ Implementação concreta do MLP. Armazena camadas em `map<int, Layer*>` ordenado
 |--------|--------|-----------|
 | `MultiLayerPerceptron()` | ✅ | Construtor padrão |
 | `MultiLayerPerceptron(IActivationFunction*)` | ✅ | Construtor com função de ativação |
-| `void configure(vector<int>, bool=true)` | ✅ | Monta a rede: cria camadas, neurônios e arestas |
+| `void configure(vector<int>, bool=true)` | ✅ | Monta a rede: cria camadas, neurônios e inicializa as `WeightMatrix` |
 | `Layer* getLayer(int i)` | ✅ | Retorna camada `i` (índice 0-based) |
 | `int countLayers()` | ✅ | Número de camadas |
 | `bool checkNetworkConstraints()` | ✅ | Verifica se tem camada de entrada e saída |
@@ -316,11 +318,11 @@ Implementação concreta do MLP. Armazena camadas em `map<int, Layer*>` ordenado
 | `double getSumSquaredError()` | ✅ | Getter do SSE |
 | *(protected)* `void addLayer(Layer*)` | ✅ | Valida ordem e insere no mapa |
 | *(protected)* `void setNeurons(Layer*, int)` | ✅ | Cria `BiasNeuron` + `n` `Neuron`s na camada |
-| *(protected)* `void setEdges(bool)` | ✅ | Liga todos neurônios de camada `l-1` a todos de camada `l` |
+| *(protected)* `void initWeights(bool)` | ✅ | Para cada camada `l` ≥ 1, chama `layer->initWeights(prevCount, random)` onde `prevCount` = tamanho total da camada `l-1` (incluindo bias) |
 | *(protected)* `void setMeanSquaredError()` | ⚠️ **Vazio** | Deve calcular MSE a partir dos erros dos neurônios de saída |
 | *(protected)* `void setSumSquaredError()` | ⚠️ **Vazio** | Deve somar erros quadráticos dos neurônios de saída |
 
-> **Estrutura interna:** `configure({2,3,1})` cria 3 camadas. Camada 0 tem 1 bias + 2 neurônios, camada 1 tem 1 bias + 3 neurônios, camada 2 tem 1 neurônio (sem bias na saída).
+> **Estrutura interna:** `configure({2,3,1})` cria 3 camadas. Camada 0 tem 1 bias + 2 neurônios, camada 1 tem 1 bias + 3 neurônios, camada 2 tem 1 neurônio (sem bias na saída). As arestas entre neurônios não existem mais; os pesos ficam em `WeightMatrix`: camada 1 tem matriz 3×3 (3 não-bias × 3 neurônios de entrada incluindo bias), camada 2 tem matriz 1×4 (1 saída × 4 neurônios ocultos incluindo bias).
 
 ---
 
@@ -352,8 +354,10 @@ Implementa `ILearningAlgorithm<MultiLayerPerceptron>`.
 | `network` | `MultiLayerPerceptron*` | Rede alvo |
 | `iterations` | `int` | Número de épocas |
 | `learningRate` | `double` | Taxa η |
-| `squaredError` | `double` | Erro quadrático acumulado |
-| `meanSquaredError` | `double` | MSE calculado |
+| `inputData` | `vector<vector<double>>` | Amostras de entrada do conjunto de treino |
+| `targetData` | `vector<vector<double>>` | Alvos correspondentes do conjunto de treino |
+| `currentInputs` | `vector<double>` | Entrada da amostra atual |
+| `currentTargets` | `vector<double>` | Alvo da amostra atual |
 
 | Método | Status | Descrição |
 |--------|--------|-----------|
@@ -363,12 +367,18 @@ Implementa `ILearningAlgorithm<MultiLayerPerceptron>`.
 | `double getLearningRate()` | ✅ | Getter |
 | `void setNetwork(MultiLayerPerceptron*)` | ✅ | Setter |
 | `MultiLayerPerceptron* getNetwork()` | ✅ | Getter |
-| `void run()` | ⚠️ **Vazio** | Loop principal: executa `learn()` por `iterations` vezes |
-| `void learn()` | ⚠️ **Vazio** | Uma época: apresenta amostra, propaga, retropropaga |
-| `void propagate()` | ⚠️ **Vazio** | Forward pass: avalia neurônios camada a camada |
-| `void backpropagate()` | ⚠️ **Vazio** | Backward pass: calcula δ e atualiza pesos |
-| `double computeSquaredError(Neuron&)` | ⚠️ **Vazio** | Erro quadrático de um neurônio |
-| `double computeMeanSquaredError()` | ⚠️ **Vazio** | MSE sobre neurônios de saída |
+| `void setTrainingData(vector<vector<double>>&, vector<vector<double>>&)` | ✅ | Define os dados de treino |
+| `void run()` | ✅ | Loop principal: chama `learn()` por `iterations` vezes |
+| `void learn()` | ✅ | Uma época: para cada amostra, chama `propagate()` e `backpropagate()` |
+| `void propagate()` | ✅ | Atribui entradas à camada 0; executa `Layer::forward()` de l=1 até L-1 |
+| `void backpropagate()` | ✅ | Calcula δ de saída, propaga δ pelas camadas ocultas via `W^T · δ`, atualiza `W` com `η · δ_j · x_i` |
+| `double computeSquaredError(Neuron&)` | ✅ | `0.5 × (target - output)²` |
+| `double computeMeanSquaredError()` | ✅ | Média de `(target - output)²` sobre os neurônios de saída |
+
+**Fluxo do `backpropagate()`:**
+1. **Saída:** `δ_j = (target_j - out_j) × f'(net_j)`
+2. **Ocultas** (de trás para frente): `δ_i = f'(net_i) × Σ_j W[l+1][j][i] · δ_j`
+3. **Atualização:** `W[l][j][i] += η × δ_j × out_i` (para todo `l` de 1 até L-1)
 
 ---
 
@@ -388,153 +398,44 @@ Implementa `ILearningAlgorithm<MultiLayerPerceptron>`.
 #### `WeightMatrix`
 > `problem/WeightMatrix.h` | `.cpp`
 
-Matriz de pesos 2D. **Todos os métodos estão vazios.**
+Matriz de pesos 2D usada por `Layer` para armazenar todos os pesos de conexão com a camada anterior. Substitui a abordagem anterior de peso por aresta (`Edge::weight`).
 
 | Método | Status | Descrição |
 |--------|--------|-----------|
-| `WeightMatrix(int x, int y)` | ⚠️ Parcial | Chama `define()` mas alocação está comentada |
-| `double getCell(int x, int y)` | ⚠️ **Vazio** | Deveria retornar `matrix[x][y]` |
-| `void setCell(int x, int y, double)` | ⚠️ **Vazio** | Deveria escrever em `matrix[x][y]` |
-| `void load()` | ⚠️ **Vazio** | Sem implementação |
-| *(private)* `void define(int x, int y)` | ⚠️ Parcial | Salva dimensões; alocação de `matrix` comentada |
+| `WeightMatrix(int rows, int cols)` | ✅ | Aloca `matrix` como `vector<vector<double>>(rows, cols)` inicializada com zeros |
+| `double getCell(int row, int col)` | ✅ | Retorna `matrix[row][col]` |
+| `void setCell(int row, int col, double)` | ✅ | Escreve `matrix[row][col]` |
+| `void randomize()` | ✅ | Preenche toda a matriz com valores aleatórios via `ObjectID::random()` (range [-1, 1]) |
+| `int getRows()` | ✅ | Número de linhas |
+| `int getCols()` | ✅ | Número de colunas |
+| `void load()` | ⚠️ Vazio | Sem implementação |
+| *(private)* `void define(int rows, int cols)` | ✅ | Salva dimensões e aloca a matriz |
 
-> `WeightMatrix` não é usada pelo algoritmo backpropagation atualmente.
-
----
-
-## O que está faltando para concluir o Backpropagation
-
-### Passo 1 — Definir estrutura de dados de treinamento
-
-O algoritmo atualmente não tem como receber os dados de treino. É necessário:
-
-- Criar uma estrutura para amostras de entrada/saída (ex.: `vector<pair<vector<double>, vector<double>>>`)
-- Adicionar `setTrainingData(...)` em `BackPropagationLearning`
-- Ou, alternativamente, implementar `WeightMatrix` para transportar os dados
+> **Convenção:** linha = neurônio não-bias da camada atual (índice `j`); coluna = neurônio (incluindo bias) da camada anterior (índice `i`).
 
 ---
 
-### Passo 2 — Implementar `propagate()`
-> `BackPropagationLearning.cpp`, linha 55
-
-Forward pass: percorre as camadas da entrada para a saída, chamando `eval(time)` em cada neurônio.
-
-```
-para cada camada l de 0 até L:
-    para cada neurônio n na camada l:
-        n.eval(time)   // já implementado em AbstractNeuron
-```
-
-`time` deve ser incrementado a cada apresentação de amostra para invalidar o cache.
-
----
-
-### Passo 3 — Implementar `computeSquaredError(Neuron &n)`
-> `BackPropagationLearning.cpp`, linha 67
-
-```
-erro(n) = (target(n) - output(n))²
-```
-
-Requer acesso ao valor alvo (`target`) da amostra atual.
-
----
-
-### Passo 4 — Implementar `computeMeanSquaredError()`
-> `BackPropagationLearning.cpp`, linha 63
-
-```
-MSE = (1/|saída|) × Σ computeSquaredError(nᵢ)
-      para cada neurônio nᵢ na camada de saída
-```
-
----
-
-### Passo 5 — Implementar `backpropagate()`
-> `BackPropagationLearning.cpp`, linha 59
-
-**5a. Calcular δ para neurônios de saída:**
-```
-erro(j)  = target(j) - output(j)
-delta(j) = erro(j) × f'(net(j))
-```
-
-**5b. Propagar δ para camadas ocultas (de trás para frente):**
-```
-para cada camada l de L-1 até 1:
-    para cada neurônio j na camada l:
-        erro(j) = Σ [ delta(k) × w(k←j) ]
-                  para cada neurônio k da camada l+1 que j conecta
-        delta(j) = erro(j) × f'(net(j))
-```
-
-**5c. Atualizar pesos:**
-```
-para cada neurônio j (de qualquer camada com arestas):
-    para cada aresta e entrando em j (e conecta i → j):
-        e.weight += learningRate × delta(j) × output(i)
-```
-
-> `output(i)` = `e.getVertex1().getValue()`
-> `delta(j)` = `j.getDelta()`
-> `f'(net(j))` = `j.getFunction().derive(net(j))`
-
----
-
-### Passo 6 — Implementar `learn()`
-> `BackPropagationLearning.cpp`, linha 51
-
-```
-para cada amostra (entrada, target) no dataset:
-    1. Atribuir valores de entrada aos neurônios da camada 0
-    2. propagate()
-    3. backpropagate()
-    4. Acumular erro com computeSquaredError()
-```
-
----
-
-### Passo 7 — Implementar `run()`
-> `BackPropagationLearning.cpp`, linha 47
-
-```
-para t de 1 até iterations:
-    learn()
-    computeMeanSquaredError()
-    (opcional) imprimir MSE
-```
-
----
-
-### Passo 8 — Implementar `setMeanSquaredError()` e `setSumSquaredError()` no MLP
-> `MultiLayerPerceptron.cpp`, linhas 183 e 190
-
-Esses métodos devem ser chamados por `BackPropagationLearning` após cada época para atualizar os campos `meanSquaredError` e `sumSquaredError` da rede.
-
----
-
-### Passo 9 *(Opcional)* — Implementar `WeightMatrix`
-> `problem/WeightMatrix.cpp`
-
-Necessário se quiser exportar/importar pesos treinados. Não é bloqueador para o backpropagation funcionar.
-
----
-
-## Dependências de Implementação
+## Fluxo de Execução
 
 ```
 run()
- └── learn()
-      ├── [atribuir entradas]
-      ├── propagate()          → usa AbstractNeuron::eval() ✅
-      ├── backpropagate()
-      │    ├── computeSquaredError()
-      │    ├── [calcula delta de saída]
-      │    ├── [propaga delta para ocultas]
-      │    └── [atualiza Edge::weight]
-      └── computeMeanSquaredError()
-           └── computeSquaredError()
+ └── learn()                         ← por cada amostra do dataset
+      ├── [atribuir entradas à camada 0]
+      ├── propagate()
+      │    └── Layer::forward(prev)  ← l = 1..L-1
+      │         └── W[j][i] * x_i → net_j → f(net_j)
+      └── backpropagate()
+           ├── [delta de saída]      ← (target - out) * f'(net)
+           ├── [delta ocultas]       ← W^T · δ_{l+1} * f'(net)
+           └── [atualiza W]          ← W[j][i] += η * δ_j * x_i
 ```
+
+## O que ainda está pendente
+
+| Item | Status |
+|------|--------|
+| `setMeanSquaredError()` / `setSumSquaredError()` no MLP | ⚠️ Vazios (não bloqueiam o treino) |
+| `WeightMatrix::load()` | ⚠️ Vazio (para importar pesos salvos) |
 
 ---
 
@@ -545,11 +446,14 @@ FuncSigmoid fs;
 MultiLayerPerceptron mlp{&fs};
 mlp.configure({2, 3, 1});   // 2 entradas, 3 ocultos, 1 saída
 
+vector<vector<double>> inputs  = {{0,0},{0,1},{1,0},{1,1}};
+vector<vector<double>> targets = {{0},  {1},  {1},  {0}};
+
 BackPropagationLearning bp;
 bp.setNetwork(&mlp);
 bp.setLearningRate(0.5);
 bp.setIterations(10000);
-// bp.setTrainingData(...)   <-- a ser implementado
+bp.setTrainingData(inputs, targets);
 
 bp.run();
 ```
@@ -561,14 +465,12 @@ bp.run();
 | Componente | Status |
 |------------|--------|
 | `ObjectID`, `IdGenerator` | ✅ Completo |
-| `Edge` | ✅ Completo |
+| `Edge` | ✅ Completo (estrutura mantida; não usada no forward/backprop) |
 | `AbstractNeuron`, `Neuron`, `BiasNeuron` | ✅ Completo |
 | `FuncSigmoid`, `FuncTanH`, `FuncRectifier` | ✅ Completo |
-| `Layer` | ✅ Completo |
-| `MultiLayerPerceptron` (estrutura e configuração) | ✅ Completo |
+| `Layer` (incluindo `forward`, `initWeights`, `getWeights`) | ✅ Completo |
+| `WeightMatrix` (incluindo `randomize`, `getCell`, `setCell`) | ✅ Completo |
+| `MultiLayerPerceptron` (estrutura, configuração e `initWeights`) | ✅ Completo |
 | `MultiLayerPerceptron::setMeanSquaredError/SSE` | ⚠️ Vazio |
-| `BackPropagationLearning` (getters/setters) | ✅ Completo |
-| `BackPropagationLearning::run/learn/propagate/backpropagate` | ❌ Não implementado |
-| `BackPropagationLearning::computeSquaredError/MSE` | ❌ Não implementado |
-| `WeightMatrix` | ❌ Não implementado |
-| Estrutura de dados de treino | ❌ Ausente |
+| `BackPropagationLearning` (todos os métodos) | ✅ Completo |
+| `WeightMatrix::load()` | ⚠️ Vazio |

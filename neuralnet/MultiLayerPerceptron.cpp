@@ -12,7 +12,6 @@
 #include "neuron/Neuron.h"
 #include "neuron/BiasNeuron.h"
 #include "../core/ObjectID.h"
-#include "../core/Edge.h"
 #include "functions/IActivationFunction.h"
 #include <iostream>
 #include <vector>
@@ -89,7 +88,7 @@ void MultiLayerPerceptron::configure(vector<int> ln, bool randomWeight){
             this->setNeurons(layer,ln.at(l));
             this->addLayer(layer);
         }
-        this->setEdges(randomWeight);
+        this->initWeights(randomWeight);
     }
 }
 
@@ -118,25 +117,16 @@ void MultiLayerPerceptron::setNeurons(Layer *l, int n){
 }
 
 /**
- * Cria as arestas de conexao dos nos nas camadas da rede, 
- * comecando pela ultima camada ate a primeira.
- * 
- * @param randomWeight boolean, se randomWeight == true entao os pesos sao inicializados aleatoriamente
+ * Inicializa a WeightMatrix de cada camada (exceto a de entrada).
+ * rows = neurônios não-bias da camada l
+ * cols = todos os neurônios da camada l-1 (incluindo bias)
+ *
+ * @param randomWeight se true, pesos são inicializados aleatoriamente
  */
-void MultiLayerPerceptron::setEdges(bool randomWeight){
-    for(int l = (this->countLayer-1); l > 0; l--){
-        for(auto &n2 : this->getLayer(l)->getNeurons()){
-            if(n2->getType() == UnitType::BIAS) continue;
-            for(auto &n1 : this->getLayer(l-1)->getNeurons()){
-                ObjectID * o = new ObjectID;
-                Edge *e = new Edge(*n1, *n2);
-                e->setId(o);
-                if(randomWeight){
-                    e->setWeight(o->random());
-                }
-                n2->addEdge(e);
-            }
-        }
+void MultiLayerPerceptron::initWeights(bool randomWeight){
+    for(int l = 1; l < this->countLayer; l++){
+        int prevCount = (int)this->getLayer(l-1)->getNeurons().size();
+        this->getLayer(l)->initWeights(prevCount, randomWeight);
     }
 }
 

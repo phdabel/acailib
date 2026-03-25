@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   WeightMatrix.h
  * Author: sim
  *
@@ -9,22 +9,24 @@
 #define WEIGHTMATRIX_H
 
 #include "IMatrix.h"
-#include <cstddef>
+#include <vector>
 
 class WeightMatrix: public IMatrix {
 public:
-    int * matrix = NULL;
-    WeightMatrix(int x, int y);
+    WeightMatrix(int rows, int cols);
     WeightMatrix(const WeightMatrix& orig);
-    double getCell(int x, int y);
-    void setCell(int x, int y, double value);
-    void load();
+    double getCell(int row, int col) override;
+    void setCell(int row, int col, double value) override;
+    void randomize();
+    int getRows();
+    int getCols();
+    void load() override;
     virtual ~WeightMatrix();
 private:
-    void define(int x, int y);
-    int x = 0;
-    int y = 0;
+    void define(int rows, int cols);
+    int rows = 0;
+    int cols = 0;
+    std::vector<std::vector<double>> matrix;
 };
 
 #endif /* WEIGHTMATRIX_H */
-

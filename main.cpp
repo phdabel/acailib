@@ -15,6 +15,7 @@
 #include "./neuralnet/algorithms/BackPropagationLearning.h"
 #include "./neuralnet/functions/FuncSigmoid.h"
 #include "./core/UnitType.h"
+#include "./neuralnet/Layer.h"
 
 using namespace std;
 
@@ -76,12 +77,8 @@ int main(int argc, char** argv) {
             if (n->getType() == UnitType::BIAS) continue;
             n->setValue(inputs[s][idx++]);
         }
-        int time = 99990 + s;
         for (int l = 1; l < nLayers; l++) {
-            for (auto &n : mlp.getLayer(l)->getNeurons()) {
-                if (n->getType() == UnitType::BIAS) continue;
-                n->eval(time);
-            }
+            mlp.getLayer(l)->forward(mlp.getLayer(l - 1));
         }
         double output = mlp.getLayer(nLayers - 1)->getNeurons()[0]->getValue();
 

@@ -9,6 +9,7 @@
 #include "../Layer.h"
 #include "../neuron/Neuron.h"
 #include "../../core/UnitType.h"
+#include "../../problem/WeightMatrix.h"
 #include <vector>
 
 using namespace std;
@@ -68,7 +69,6 @@ void BackPropagationLearning::learn() {
 }
 
 void BackPropagationLearning::propagate() {
-    this->currentTime++;
     int nLayers = this->network->countLayers();
 
     // Seta os valores dos neurônios de entrada (ignora bias)
@@ -80,19 +80,14 @@ void BackPropagationLearning::propagate() {
         n->setValue(this->currentInputs[inputIdx++]);
     }
 
-    // Avalia as camadas seguintes (forward pass)
+    // Forward pass: x_{l} = f( W[l] · x_{l-1} )
     for (int l = 1; l < nLayers; l++) {
-        Layer* layer = this->network->getLayer(l);
-        for (auto &n : layer->getNeurons()) {
-            if (n->getType() == UnitType::BIAS) continue;
-            n->eval(this->currentTime);
-        }
+        this->network->getLayer(l)->forward(this->network->getLayer(l - 1));
     }
 }
 
 void BackPropagationLearning::backpropagate() {
     int nLayers = this->network->countLayers();
-    int time = this->currentTime;
 
     // Deltas da camada de saída
     Layer* outputLayer = this->network->getLayer(nLayers - 1);
@@ -101,44 +96,61 @@ void BackPropagationLearning::backpropagate() {
     for (auto &n : outputNeurons) {
         double output = n->getValue();
         double target = this->currentTargets[targetIdx++];
-        // Derivada da sigmoid: output*(1-output)
-        double delta = (target - output) * output * (1.0 - output);
+        double delta = (target - output) * n->getFunction().derive(n->getNet());
         n->setDelta(delta);
     }
 
-    // Deltas das camadas ocultas (da última para a primeira)
+    // Deltas das camadas ocultas: δ_i = f'(net_i) · Σ_j W[l+1][j][i] · δ_j
     for (int l = nLayers - 2; l > 0; l--) {
         Layer* currentLayer = this->network->getLayer(l);
         Layer* nextLayer    = this->network->getLayer(l + 1);
+        WeightMatrix* W     = nextLayer->getWeights();
         vector<AbstractNeuron*> currentNeurons = currentLayer->getNeurons();
         vector<AbstractNeuron*> nextNeurons    = nextLayer->getNeurons();
 
+        // 1. Zera os deltas
         for (auto &ni : currentNeurons) {
             if (ni->getType() == UnitType::BIAS) continue;
-            double output_i = ni->getValue();
-            double sum = 0.0;
-            for (auto &nj : nextNeurons) {
-                for (auto &edge : nj->getEdges()) {
-                    if (&edge->getVertex1() == ni) {
-                        sum += edge->getWeight() * nj->getDelta();
-                        break;
-                    }
-                }
+            ni->setDelta(0.0);
+        }
+
+        // 2. Acumula: W[l+1]ᵀ · δ_{l+1}
+        //    W[j][i]: j = neurônio não-bias de nextLayer, i = posição em currentNeurons
+        int j = 0;
+        for (auto &nj : nextNeurons) {
+            if (nj->getType() == UnitType::BIAS) continue;
+            for (int i = 0; i < (int)currentNeurons.size(); i++) {
+                if (currentNeurons[i]->getType() == UnitType::BIAS) continue;
+                currentNeurons[i]->setDelta(
+                    currentNeurons[i]->getDelta() + W->getCell(j, i) * nj->getDelta()
+                );
             }
-            ni->setDelta(output_i * (1.0 - output_i) * sum);
+            j++;
+        }
+
+        // 3. Aplica f'(net_i)
+        for (auto &ni : currentNeurons) {
+            if (ni->getType() == UnitType::BIAS) continue;
+            ni->setDelta(ni->getFunction().derive(ni->getNet()) * ni->getDelta());
         }
     }
 
-    // Atualização dos pesos
+    // Atualização dos pesos: W[l][j][i] += η · δ_j · x_i
     for (int l = 1; l < nLayers; l++) {
-        Layer* layer = this->network->getLayer(l);
-        for (auto &nj : layer->getNeurons()) {
+        Layer* layer     = this->network->getLayer(l);
+        Layer* prevLayer = this->network->getLayer(l - 1);
+        WeightMatrix* W  = layer->getWeights();
+        vector<AbstractNeuron*> currNeurons = layer->getNeurons();
+        vector<AbstractNeuron*> prevNeurons = prevLayer->getNeurons();
+
+        int j = 0;
+        for (auto &nj : currNeurons) {
             if (nj->getType() == UnitType::BIAS) continue;
-            for (auto &edge : nj->getEdges()) {
-                AbstractNeuron* ni = (AbstractNeuron*) &edge->getVertex1();
-                double update = this->learningRate * nj->getDelta() * ni->eval(time);
-                edge->setWeight(edge->getWeight() + update);
+            for (int i = 0; i < (int)prevNeurons.size(); i++) {
+                double update = this->learningRate * nj->getDelta() * prevNeurons[i]->getValue();
+                W->setCell(j, i, W->getCell(j, i) + update);
             }
+            j++;
         }
     }
 }

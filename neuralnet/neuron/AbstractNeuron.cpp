@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   AbstractNeuron.cpp
  * Author: abel
- * 
+ *
  * Created on 13 de Abril de 2017, 09:45
  */
 
@@ -9,16 +9,11 @@
 
 #include "../../core/UnitType.h"
 #include "../../core/ObjectID.h"
-#include "../../core/Edge.h"
 #include <typeinfo>
-#include <iostream>
-#include <vector>
-#include <map>
 
 using namespace std;
 
 AbstractNeuron::AbstractNeuron() {
-    
 }
 
 UnitType AbstractNeuron::getType(){
@@ -37,29 +32,15 @@ void AbstractNeuron::setId(ObjectID *obj){
     this->id = obj;
 }
 
-double AbstractNeuron::computeNetwork(){
-    double net = 0.0;
-    for(auto &edge : this->edges){
-        net += edge->eval();
-    }
-    return net;
-}
-
 void AbstractNeuron::setFunction(IActivationFunction &func){
     this->f = &func;
 }
 
-IActivationFunction& AbstractNeuron::getFunction(){    
+IActivationFunction& AbstractNeuron::getFunction(){
     return *this->f;
 }
 
 double AbstractNeuron::eval(int time){
-    if(this->edges.size() == 0){
-        return this->getValue();
-    }else if(this->timeCache == -1 || this->timeCache != time){
-        this->timeCache = time;
-        this->setValue(this->getFunction().run(this->computeNetwork()));
-    }
     return this->getValue();
 }
 
@@ -79,26 +60,12 @@ void AbstractNeuron::setError(double error){
     this->error = error;
 }
 
-void AbstractNeuron::addEdge(Edge* edge){
-    this->edges.push_back(edge);
+double AbstractNeuron::getNet(){
+    return this->net;
 }
 
-vector<Edge*> AbstractNeuron::getEdges(){
-    return this->edges;
-}
-
-Edge& AbstractNeuron::getEdge(int ij){
-    Edge* tmp = NULL;
-    for(auto &edge : this->edges){
-        if(edge->getId().getValue() == ij){
-            tmp = edge;
-            break;
-        }
-    }
-    if(tmp == NULL){
-        throw runtime_error("There is no edge with the informed ID in the neuron.");
-    }
-    return *tmp;
+void AbstractNeuron::setNet(double net){
+    this->net = net;
 }
 
 string AbstractNeuron::toString(){
@@ -109,6 +76,4 @@ AbstractNeuron::AbstractNeuron(const AbstractNeuron& orig) {
 }
 
 AbstractNeuron::~AbstractNeuron() {
-
 }
-

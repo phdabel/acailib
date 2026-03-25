@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Layer.h
  * Author: abel
  *
@@ -13,6 +13,7 @@
 #include "neuron/AbstractNeuron.h"
 #include "LayerType.h"
 #include "../core/ObjectID.h"
+#include "../problem/WeightMatrix.h"
 #include "IAbstractLayer.h"
 
 using namespace std;
@@ -34,10 +35,13 @@ public:
     LayerType getType();
     void setType(LayerType type);
     AbstractNeuron& getNeuron(int i) override;
+    void initWeights(int prevNeuronCount, bool random);
+    void forward(Layer* prev);
+    WeightMatrix* getWeights();
 private:
     map<ObjectID*,AbstractNeuron*,compareObjectID> neurons;
     LayerType type;
+    WeightMatrix* weights = nullptr;
 };
 
 #endif /* LAYER_H */
-

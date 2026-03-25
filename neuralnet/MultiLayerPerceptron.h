@@ -42,7 +42,7 @@ public:
 protected:
     void addLayer(Layer* layer);
     void setNeurons(Layer *l, int n);
-    void setEdges(bool randomWeight = true);
+    void initWeights(bool randomWeight = true);
     void setMeanSquaredError() override;
     void setSumSquaredError() override;
 private:

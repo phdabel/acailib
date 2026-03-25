@@ -29,7 +29,7 @@ protected:
     virtual bool checkNetworkConstraints() = 0;
     virtual void addLayer(IAbstractLayer* layer) = 0;
     virtual void setNeurons(IAbstractLayer *l, int n) = 0;
-    virtual void setEdges(bool randomWeight = true) = 0;
+    virtual void initWeights(bool randomWeight = true) = 0;
     virtual void setSumSquaredError() = 0;
     virtual void setMeanSquaredError() = 0;
 private:
